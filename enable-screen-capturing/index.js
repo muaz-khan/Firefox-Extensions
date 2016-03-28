@@ -20,10 +20,7 @@ function addMyOwnDomains() {
     arrayOfMyOwnDomains.forEach(function(domain) {
         if (existingDomains.indexOf(domain) === -1) {
             existingDomains.push(domain);
-        }
-
-        // else { }
-        if (existingDomains.indexOf(domain) !== -1) {
+        } else if (existingDomains.indexOf(domain) !== -1) {
             // Seems domain is already in the list.
             // Keep it when this addon is uninstalled.
             listOfSimilarAlreadyAllowedDomains.push(domain);
