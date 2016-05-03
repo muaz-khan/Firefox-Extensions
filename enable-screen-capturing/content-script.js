@@ -32,7 +32,7 @@ window.addEventListener("message", function(event) {
     }
 
     if(addonMessage && addonMessage.checkIfScreenCapturingEnabled && addonMessage.domains && addonMessage.domains.length) {
-        self.port.on('is-screen-capturing-enabled', function(response) {
+        self.port.on('is-screen-capturing-enabled-response', function(response) {
             window.postMessage(response, '*');
         });
 
