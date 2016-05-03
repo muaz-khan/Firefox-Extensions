@@ -1,3 +1,7 @@
+// Muaz Khan     - www.MuazKhan.com
+// MIT License   - www.WebRTC-Experiment.com/licence
+// Github        - github.com/muaz-khan/Firefox-Extensions
+
 var prefService = require('sdk/preferences/service');
 
 var configToReferListOfAllowedDomains = 'media.getusermedia.screensharing.allowed_domains';
@@ -20,7 +24,10 @@ function addMyOwnDomains() {
     arrayOfMyOwnDomains.forEach(function(domain) {
         if (existingDomains.indexOf(domain) === -1) {
             existingDomains.push(domain);
-        } else if (existingDomains.indexOf(domain) !== -1) {
+        }
+
+        // else { }
+        else if (existingDomains.indexOf(domain) !== -1) {
             // Seems domain is already in the list.
             // Keep it when this addon is uninstalled.
             listOfSimilarAlreadyAllowedDomains.push(domain);
@@ -81,6 +88,21 @@ var pageMod = mod.PageMod({
 
             arrayOfMyOwnDomains = arrayOfMyOwnDomains.concat(domains);
             addMyOwnDomains();
+        });
+
+        worker.port.on("is-screen-capturing-enabled", function(domains) {
+            var isScreenCapturingEnabled = false;
+
+            prefService.get(configToReferListOfAllowedDomains).split(',').forEach(function(domain) {
+                if(domains.indexOf(domain) !== -1) {
+                    isScreenCapturingEnabled = true;
+                }
+            });
+
+            worker.port.emit('is-screen-capturing-enabled-response', {
+                isScreenCapturingEnabled: isScreenCapturingEnabled,
+                domains: domains
+            });
         });
     }
 });
