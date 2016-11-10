@@ -81,29 +81,27 @@ var pageMod = mod.PageMod({
     contentScriptFile: "./../content-script.js",
     contentScriptWhen: "start", // or "ready"
     onAttach: function(worker) {
-        // webpages can verify if their domains are REALLY enabled or not.
-        worker.port.on("is-screen-capturing-enabled", function() {
+        worker.port.on("installation-confirmed", function(domains) {
+            // make sure that this addon's self-domains (i.e. "arrayOfMyOwnDomains")
+            // are not included in the "listOfSimilarAlreadyAllowedDomains" array.
+            removeMyDomainOnUnInstall();
+
+            arrayOfMyOwnDomains = arrayOfMyOwnDomains.concat(domains);
+            addMyOwnDomains();
+        });
+
+        worker.port.on("is-screen-capturing-enabled", function(domains) {
             var isScreenCapturingEnabled = false;
 
-            var arrayOfEnabledDomains = [];
-
             prefService.get(configToReferListOfAllowedDomains).split(',').forEach(function(domain) {
-                if(arrayOfMyOwnDomains.indexOf(domain) !== -1) {
-                    // maybe we need to check whether all of, my own, domains are enabled?
+                if(domains.indexOf(domain) !== -1) {
                     isScreenCapturingEnabled = true;
-
-                    // we will pass this to the webpage
-                    // so webpage can understand which domain is enabled; and which is NOT.
-                    arrayOfEnabledDomains.push(domain);
                 }
             });
 
             worker.port.emit('is-screen-capturing-enabled-response', {
                 isScreenCapturingEnabled: isScreenCapturingEnabled,
-
-                // pass only those domains that are enabled for screen capturing
-                // however those domains MUST be our own
-                domains: arrayOfEnabledDomains
+                domains: domains
             });
         });
     }
