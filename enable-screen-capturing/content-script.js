@@ -7,7 +7,7 @@
 window.addEventListener("message", function(event) {
     // do NOT allow external domains
     // via: https://github.com/muaz-khan/Firefox-Extensions/issues/11
-    if (event.source !== window) return;
+    if (event.source !== document.defaultView) return;
 
     var addonMessage = event.data;
 
