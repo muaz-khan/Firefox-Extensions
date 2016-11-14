@@ -9,6 +9,9 @@ var configToEnableScreenCapturing = 'media.getusermedia.screensharing.enabled';
 
 // replace your own domains with below array
 var arrayOfMyOwnDomains = ['webrtc-experiment.com', 'www.webrtc-experiment.com', 'localhost', '127.0.0.1'];
+// Patterns to match the websites that may check whether ther add-on is installed.
+// See https://developer.mozilla.org/en-US/Add-ons/SDK/Low-Level_APIs/util_match-pattern
+var patternsOfMyDomains = ['*.webrtc-experiment.com', /https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/.*/];
 
 // e.g. if 127.0.0.1 or localhost is already allowed by anyone else
 var listOfSimilarAlreadyAllowedDomains = [];
@@ -65,19 +68,12 @@ unload(function() {
     removeMyDomainOnUnInstall();
 });
 
-/*
-* connect with webpage using postMessage
-* a webpage can use following API to enable screen capturing for his domains
-* window.postMessage({ enableScreenCapturing: true, domains: ["www.firefox.com"] }, "*");
-* 
-* current firefox user is always asked to confirm whether he is OK to enable screen capturing for requested domains.
-*/
 var tabs = require("sdk/tabs");
 var mod = require("sdk/page-mod");
 var self = require("sdk/self");
 
 var pageMod = mod.PageMod({
-    include: ["*"],
+    include: patternsOfMyDomains,
     contentScriptFile: "./../content-script.js",
     contentScriptWhen: "start", // or "ready"
     onAttach: function(worker) {
